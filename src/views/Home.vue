@@ -19,14 +19,7 @@ export default defineComponent({
   name: "Home",
   components: {},
   setup() {
-    const socket = io("http://localhost:3000");
-
-    const playEvent = () => {
-      console.log("Emit play!");
-      socket.emit("play");
-    };
-
-    return { playEvent };
+    return {  };
   },
 });
 </script>
