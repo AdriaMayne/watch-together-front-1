@@ -1,6 +1,6 @@
 import io from "socket.io-client";
 
-const URL = process.env.BACKEND_URL;
+const URL = process.env.VUE_APP_BACKEND_URL;
 console.log("Url", URL);
 const socket = io(URL);
 
