@@ -1,6 +1,8 @@
 module.exports = {
   root: true,
   env: {
+    es6: true,
+    browser: true,
     node: true,
   },
   extends: ["plugin:vue/vue3-essential", "eslint:recommended", "@vue/prettier"],
@@ -10,8 +12,8 @@ module.exports = {
   rules: {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-    "no-unused-vars": "off",
-    "no-undef":"off"
+    "no-unused-vars": "warn",
+    "no-undef": "off",
   },
   overrides: [
     {
@@ -24,5 +26,5 @@ module.exports = {
       },
     },
   ],
-  "ignorePatterns": ["temp.js", "**/vendor/*.js", "**/node_modules/**/*.js"],
+  ignorePatterns: ["temp.js", "**/vendor/*.js", "**/node_modules/**/*.js"],
 };

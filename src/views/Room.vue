@@ -27,10 +27,10 @@
   </div>
 </template>
 
-<script lang="ts">
+<script>
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
-import Videojs from "@/components/Videojs";
+import Videojs from "@/components/Video";
 import socket from "@/utils/socket";
 
 import InputText from "primevue/inputtext";
@@ -125,12 +125,12 @@ export default defineComponent({
 
     // Player events
     const playEvent = (player) => {
-      // console.log("Emit play!");
+      console.log("player", player);
       socket.emit("play");
     };
 
     const pauseEvent = (player) => {
-      // console.log("Emit pause!");
+      console.log("player", player);
       socket.emit("pause");
     };
 
@@ -165,7 +165,7 @@ export default defineComponent({
     onMounted(() => {
       document.addEventListener(
         "visibilitychange",
-        (d) => {
+        () => {
           if (!document.hidden) {
             console.log("Executing visibilitychange");
             socket.emit("syncronice");
