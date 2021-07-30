@@ -5,17 +5,10 @@
 </template>
 
 <script>
-import {
-  defineComponent,
-  ref,
-  watch,
-  onMounted,
-  onBeforeUnmount,
-  toRefs,
-} from "vue";
+import { defineComponent, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import videojs from "video.js";
-import "videojs-youtube";
 import debounce from "lodash-es/debounce";
+import "videojs-youtube";
 import "video.js/dist/video-js.css";
 
 export default defineComponent({
@@ -56,18 +49,7 @@ export default defineComponent({
     },
   },
   setup(props, { emit }) {
-    const {
-      techOrder,
-      muted,
-      fluid,
-      controls,
-      playsinline,
-      preload,
-      youtube,
-      sources,
-    } = toRefs(props);
-    const [firstSource] = sources;
-    console.log(firstSource);
+    const [firstSource] = props.sources;
     let player;
     const videoContainer = ref(null);
     const seekingDebounce = debounce(emit, 50, { maxWait: 100 });
@@ -89,31 +71,27 @@ export default defineComponent({
 
     const setUpPlayer = () => {
       player = videojs("video", {
-        techOrder,
-        muted,
-        fluid,
-        controls,
-        playsinline,
-        preload,
-        youtube,
-        sources,
+        techOrder: props.techOrder,
+        muted: props.muted,
+        fluid: props.fluid,
+        controls: props.controls,
+        playsinline: props.playsinline,
+        preload: props.preload,
+        youtube: props.youtube,
+        sources: props.sources,
       });
 
       emit("mounted", player);
 
       player.on("play", () => {
-        // console.log("play", player);
         emit("play", player);
       });
 
       player.on("pause", () => {
-        // console.log("pause", player);
         emit("pause", player);
       });
       player.on("seeking", () => {
-        // console.log("!seeking!");
         if (player.scrubbing_ && player.hasStarted_) {
-          // console.log("seeking", player.currentTime());
           seekingDebounce("seeking", player);
         }
       });

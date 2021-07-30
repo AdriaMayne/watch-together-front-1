@@ -13,13 +13,12 @@
 
 <script lang="ts">
 import { defineComponent } from "vue";
-import io from "socket.io-client";
 
 export default defineComponent({
   name: "Home",
   components: {},
   setup() {
-    return {  };
+    return {};
   },
 });
 </script>

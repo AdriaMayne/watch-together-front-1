@@ -5,7 +5,7 @@ export default {
   component: Video,
 };
 
-export const Primary = () => ({
+export const Default = () => ({
   components: { Video },
   template: "<Video />",
 });
