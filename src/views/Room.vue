@@ -30,7 +30,7 @@
 <script>
 import { defineComponent, onMounted, reactive, ref } from "vue";
 import { useRoute } from "vue-router";
-import Videojs from "@/components/Video";
+import Videojs from "@/components/Videojs";
 import socket from "@/utils/socket";
 
 import InputText from "primevue/inputtext";
