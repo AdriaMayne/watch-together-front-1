@@ -8,11 +8,8 @@
 import { defineComponent, ref, watch, onMounted, onBeforeUnmount } from "vue";
 import videojs from "video.js";
 import "videojs-youtube";
-// import "videojs-resolution-switcher";
 import debounce from "lodash-es/debounce";
-
 import "video.js/dist/video-js.css";
-// import "videojs-resolution-switcher/lib/videojs-resolution-switcher.css";
 
 export default defineComponent({
   name: "Videojs",
