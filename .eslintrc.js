@@ -11,7 +11,7 @@ module.exports = {
     "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
     "no-unused-vars": "off",
-    "no-undef":"off"
+    "no-undef": "off",
   },
   overrides: [
     {
@@ -24,5 +24,5 @@ module.exports = {
       },
     },
   ],
-  "ignorePatterns": ["temp.js", "**/vendor/*.js", "**/node_modules/**/*.js"],
+  ignorePatterns: ["temp.js", "**/vendor/*.js", "**/node_modules/**/*.js"],
 };
