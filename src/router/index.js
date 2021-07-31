@@ -1,10 +1,10 @@
-import { createRouter, createWebHistory } from "vue-router";
-import Home from "@/views/Home.vue";
+import { createRouter, createWebHistory } from 'vue-router';
+import Home from '@/views/Home.vue';
 
 const routes = [
   {
-    path: "/",
-    name: "Home",
+    path: '/',
+    name: 'Home',
     component: Home,
   },
   // {
@@ -17,15 +17,15 @@ const routes = [
   //     import(/* webpackChunkName: "about" */ "@/views/About.vue"),
   // },
   {
-    path: "/room/:id",
-    name: "Room",
-    component: () => import(/* webpackChunkName: "about" */ "@/views/Room.vue"),
+    path: '/room/:id',
+    name: 'Room',
+    component: () => import(/* webpackChunkName: "about" */ '@/views/Room.vue'),
   },
 ];
 
 // Always leave this as last one
 routes.push({
-  path: "/:catchAll(.*)",
+  path: '/:catchAll(.*)',
   component: Home,
 });
 

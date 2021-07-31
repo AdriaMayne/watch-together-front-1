@@ -5,19 +5,18 @@
 </template>
 
 <script>
-import { defineComponent, ref, watch, onMounted, onBeforeUnmount } from "vue";
-import videojs from "video.js";
-import debounce from "lodash-es/debounce";
-import "videojs-youtube";
-import "video.js/dist/video-js.css";
+import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue';
+import videojs from 'video.js';
+import debounce from 'lodash-es/debounce';
+import 'videojs-youtube';
+import 'video.js/dist/video-js.css';
 
 export default defineComponent({
-  name: "Videojs",
-  emits: ["mounted", "play", "pause", "seeking", "timeupdate"],
+  name: 'Videojs',
   props: {
     techOrder: {
       type: Array,
-      default: () => ["html5", "youtube"],
+      default: () => ['html5', 'youtube'],
     },
     muted: {
       type: Boolean,
@@ -37,7 +36,7 @@ export default defineComponent({
     },
     preload: {
       type: String,
-      default: "auto",
+      default: 'auto',
     },
     youtube: {
       type: Object,
@@ -45,32 +44,18 @@ export default defineComponent({
     },
     sources: {
       type: Array,
-      default: () => [{ src: "https://www.youtube.com/watch?v=dQw4w9WgXcQ" }],
+      default: () => [{ src: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ' }],
     },
   },
+  emits: ['mounted', 'play', 'pause', 'seeking', 'timeupdate'],
   setup(props, { emit }) {
-    const [firstSource] = props.sources;
     let player;
     const videoContainer = ref(null);
     const seekingDebounce = debounce(emit, 50, { maxWait: 100 });
     const timeupdateDebounce = debounce(emit, 25, { maxWait: 50 });
 
-    watch(
-      () => firstSource.src,
-      () => {
-        player.src(firstSource);
-        // Dispose is needed since youtube videos don't change src properly
-        player.dispose();
-        const videoTag = document.createElement("video");
-        videoTag.id = "video";
-        videoTag.className = "video-js vjs-theme";
-        videoContainer.value.appendChild(videoTag);
-        setUpPlayer();
-      }
-    );
-
     const setUpPlayer = () => {
-      player = videojs("video", {
+      player = videojs('video', {
         techOrder: props.techOrder,
         muted: props.muted,
         fluid: props.fluid,
@@ -81,24 +66,24 @@ export default defineComponent({
         sources: props.sources,
       });
 
-      emit("mounted", player);
+      emit('mounted', player);
 
-      player.on("play", () => {
-        emit("play", player);
+      player.on('play', () => {
+        emit('play', player);
       });
 
-      player.on("pause", () => {
-        emit("pause", player);
+      player.on('pause', () => {
+        emit('pause', player);
       });
-      player.on("seeking", () => {
+      player.on('seeking', () => {
         if (player.scrubbing_ && player.hasStarted_) {
-          seekingDebounce("seeking", player);
+          seekingDebounce('seeking', player);
         }
       });
 
-      player.on("timeupdate", () => {
+      player.on('timeupdate', () => {
         if (player.hasStarted_) {
-          timeupdateDebounce("timeupdate", player);
+          timeupdateDebounce('timeupdate', player);
         }
       });
     };

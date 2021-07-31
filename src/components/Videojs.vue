@@ -4,97 +4,68 @@
   </div>
 </template>
 
-<script lang="ts">
-import { defineComponent, ref, watch, onMounted, onBeforeUnmount } from "vue";
-import videojs from "video.js";
-import "videojs-youtube";
-import debounce from "lodash-es/debounce";
-import "video.js/dist/video-js.css";
+<script>
+import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue';
+import videojs from 'video.js';
+import 'videojs-youtube';
+import debounce from 'lodash-es/debounce';
+import 'video.js/dist/video-js.css';
 
 export default defineComponent({
-  name: "Videojs",
-  emits: ["mounted", "play", "pause", "seeking", "timeupdate"],
+  name: 'Videojs',
   props: {
     data: {
       type: Object,
       default: () => ({
-        techOrder: ["html5", "youtube"],
-        muted: true,
-        fluid: true,
-        controls: true,
-        playsinline: true,
-        preload: "auto",
-        // sources: [
-        //   {
-        //     src: "https://www.youtube.com/watch?v=UN3uF3990Q0",
-        //     type: "video/youtube",
-        //   },
-        // ],
-        youtube: {
-          ytControls: 0,
-        },
-        // plugins: {
-        //   videoJsResolutionSwitcher: {
-        //     dynamicLabel: true,
-        //   },
-        // },
+        sources: [
+          {
+            src: 'https://www.youtube.com/watch?v=UN3uF3990Q0',
+            type: 'video/youtube',
+          },
+        ],
       }),
     },
   },
+  emits: ['mounted', 'play', 'pause', 'seeking', 'timeupdate'],
   setup(props, { emit }) {
     let player;
     const videoContainer = ref(null);
     const seekingDebounce = debounce(emit, 50, { maxWait: 100 });
     const timeupdateDebounce = debounce(emit, 25, { maxWait: 50 });
 
-    watch(
-      () => props.data.sources[0].src,
-      () => {
-        // console.log("Watcher!");
-        player.src(props.data.sources[0]);
-        // Dispose is needed since youtube videos don't change src properly
-        player.dispose();
-        const videoTag = document.createElement("video");
-        videoTag.id = "video";
-        videoTag.className = "video-js vjs-theme";
-        videoContainer.value.appendChild(videoTag);
-        setUpPlayer();
-      }
-    );
-
     const setUpPlayer = () => {
-      player = videojs("video", {
-        techOrder: ["html5", "youtube"],
+      player = videojs('video', {
+        techOrder: ['html5', 'youtube'],
         muted: true,
         fluid: true,
         controls: true,
         playsinline: true,
-        preload: "auto",
+        preload: 'auto',
         ...props.data,
       });
 
-      emit("mounted", player);
+      emit('mounted', player);
 
-      player.on("play", () => {
-        // console.log("play", player);
-        emit("play", player);
+      player.on('play', (e) => {
+        console.log('play', e);
+        emit('play', player);
       });
 
-      player.on("pause", () => {
-        // console.log("pause", player);
-        emit("pause", player);
+      player.on('pause', (e) => {
+        console.log('pause', e);
+        emit('pause', player);
       });
-      player.on("seeking", () => {
+      player.on('seeking', () => {
         // console.log("!seeking!");
         if (player.scrubbing_ && player.hasStarted_) {
           // console.log("seeking", player.currentTime());
-          seekingDebounce("seeking", player);
+          seekingDebounce('seeking', player);
         }
       });
 
-      player.on("timeupdate", () => {
+      player.on('timeupdate', () => {
         if (player.hasStarted_) {
-          timeupdateDebounce("timeupdate", player);
+          timeupdateDebounce('timeupdate', player);
         }
       });
     };
@@ -104,6 +75,7 @@ export default defineComponent({
     onBeforeUnmount(() => {
       player.dispose();
     });
+
     return { player, videoContainer };
   },
 });
@@ -294,7 +266,7 @@ export default defineComponent({
 }
 
 .vjs-theme .vjs-volume-bar::before {
-  content: "";
+  content: '';
   z-index: 0;
   width: 0;
   height: 0;
@@ -314,7 +286,7 @@ export default defineComponent({
 }
 
 .vjs-theme .vjs-volume-level::before {
-  content: "";
+  content: '';
   z-index: 1;
   width: 0;
   height: 0;

@@ -1,7 +1,7 @@
 <template>
   <div class="flex flex-column justify-content-between">
     <div>
-      <InputText type="text" v-model="newSrc" />
+      <InputText v-model="newSrc" type="text" />
       <Button
         label="Change src"
         @click="
@@ -15,6 +15,7 @@
 
     <div class="flex justify-content-center">
       <videojs
+        :key="playerOptions.sources[0].src"
         class="video-comp"
         :data="playerOptions"
         @mounted="setMounted"
@@ -28,16 +29,17 @@
 </template>
 
 <script>
-import { defineComponent, onMounted, reactive, ref } from "vue";
-import { useRoute } from "vue-router";
-import Videojs from "@/components/Videojs";
-import socket from "@/utils/socket";
+import { defineComponent, onMounted, reactive, ref } from 'vue';
+import { useRoute } from 'vue-router';
+// import Videojs from '@/components/Videojs';
+import Videojs from '@/components/Video';
+import socket from '@/utils/socket';
 
-import InputText from "primevue/inputtext";
-import Button from "primevue/button";
+import InputText from 'primevue/inputtext';
+import Button from 'primevue/button';
 
 export default defineComponent({
-  name: "Room",
+  name: 'Room',
   components: {
     Videojs,
     InputText,
@@ -46,7 +48,7 @@ export default defineComponent({
   setup() {
     const route = useRoute();
     const roomId = route.params.id;
-    const newSrc = ref("");
+    const newSrc = ref('');
     const playerOptions = reactive({
       sources: [
         {
@@ -58,35 +60,35 @@ export default defineComponent({
       ],
     });
     window.socket = socket;
-    socket.emit("join-room", { roomId });
+    socket.emit('join-room', { roomId });
 
     let player = null;
     const setMounted = (p) => {
       player = p;
       window.player = player;
-      player.one("play", () => {
+      player.one('play', () => {
         // console.log("First play");
-        socket.emit("syncronice");
+        socket.emit('syncronice');
       });
     };
 
-    socket.on("changesrc", (data) => {
-      console.log("onchangesrc", data);
+    socket.on('changesrc', (data) => {
+      console.log('onchangesrc', data);
       changeSrc(data.src);
     });
 
-    socket.emit("syncronice");
+    socket.emit('syncronice');
 
-    socket.on("syncronice", ({ lastSeeking, playing }) => {
-      console.log("Syncronicing!:", lastSeeking, playing);
+    socket.on('syncronice', ({ lastSeeking, playing }) => {
+      console.log('Syncronicing!:', lastSeeking, playing);
       try {
         if (lastSeeking) {
-          player.tech_["trigger"]("firstplay");
+          player.tech_['trigger']('firstplay');
           player.currentTime(lastSeeking);
         }
         if (playing) {
           player.play().catch((e) => {
-            console.error("Play catch", e);
+            console.error('Play catch', e);
           });
         }
       } catch (error) {
@@ -94,7 +96,7 @@ export default defineComponent({
       }
     });
 
-    socket.on("play", () => {
+    socket.on('play', () => {
       if (player.paused()) {
         // console.log("Socket onplay");
         player.play();
@@ -102,21 +104,21 @@ export default defineComponent({
     });
 
     // Socket events
-    socket.on("play", () => {
+    socket.on('play', () => {
       if (player.paused()) {
         // console.log("Socket onplay");
         player.play();
       }
     });
 
-    socket.on("pause", () => {
+    socket.on('pause', () => {
       if (!player.paused()) {
         // console.log("Socket onpause");
         player.pause();
       }
     });
 
-    socket.on("seeking", (time) => {
+    socket.on('seeking', (time) => {
       if (!player.scrubbing_) {
         // console.log("Socket onseeking", time);
         player.currentTime(time);
@@ -125,50 +127,50 @@ export default defineComponent({
 
     // Player events
     const playEvent = (player) => {
-      console.log("player", player);
-      socket.emit("play");
+      console.log('player', player);
+      socket.emit('play');
     };
 
     const pauseEvent = (player) => {
-      console.log("player", player);
-      socket.emit("pause");
+      console.log('player', player);
+      socket.emit('pause');
     };
 
     const seekingEvent = (player) => {
       // console.log("Emit seeking!", player.currentTime());
-      socket.volatile.emit("seeking", player.currentTime());
+      socket.volatile.emit('seeking', player.currentTime());
     };
 
     const timeupdateEvent = (player) => {
-      socket.volatile.emit("timeupdate", player.currentTime());
+      socket.volatile.emit('timeupdate', player.currentTime());
     };
 
     const changeSrc = (src) => {
-      console.log("changeSrc", src);
+      console.log('changeSrc', src);
 
       playerOptions.sources[0].src = src;
       if (
         playerOptions.sources[0].src &&
-        playerOptions.sources[0].src.includes("youtube")
+        playerOptions.sources[0].src.includes('youtube')
       ) {
-        playerOptions.sources[0].type = "video/youtube";
+        playerOptions.sources[0].type = 'video/youtube';
       } else {
         playerOptions.sources[0].type = null;
       }
     };
 
     const emitChangeSrc = () => {
-      socket.emit("changesrc", playerOptions.sources[0].src);
-      console.log("Emit changesrc");
+      socket.emit('changesrc', playerOptions.sources[0].src);
+      console.log('Emit changesrc');
     };
 
     onMounted(() => {
       document.addEventListener(
-        "visibilitychange",
+        'visibilitychange',
         () => {
           if (!document.hidden) {
-            console.log("Executing visibilitychange");
-            socket.emit("syncronice");
+            console.log('Executing visibilitychange');
+            socket.emit('syncronice');
           }
         },
         { once: true }
