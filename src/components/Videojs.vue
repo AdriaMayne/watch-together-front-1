@@ -6,14 +6,14 @@
 </template>
 
 <script>
-import { defineComponent, ref, onMounted, onBeforeUnmount } from 'vue';
-import videojs from 'video.js';
-import 'videojs-youtube';
-import debounce from 'lodash-es/debounce';
-import 'video.js/dist/video-js.css';
+import { defineComponent, ref, onMounted, onBeforeUnmount } from "vue";
+import videojs from "video.js";
+import "videojs-youtube";
+import debounce from "lodash-es/debounce";
+import "video.js/dist/video-js.css";
 
 export default defineComponent({
-  name: 'Videojs',
+  name: "Videojs",
   components: {},
   props: {
     data: {
@@ -30,7 +30,7 @@ export default defineComponent({
       }),
     },
   },
-  emits: ['mounted', 'play', 'pause', 'seeking', 'timeupdate'],
+  emits: ["mounted", "play", "pause", "seeking", "timeupdate"],
   setup(props, { emit }) {
     let player;
     const videoContainer = ref(null);
@@ -38,34 +38,36 @@ export default defineComponent({
     const timeUpdateDebounce = debounce(emit, 25, { maxWait: 50 });
 
     const setUpPlayer = () => {
-      player = videojs('video', {
-        techOrder: ['html5', 'youtube'],
+      player = videojs("video", {
+        techOrder: ["html5", "youtube"],
         muted: true,
         fluid: true,
         controls: true,
         playsinline: true,
-        preload: 'auto',
+        preload: "auto",
         ...props.data,
       });
 
-      emit('mounted', player);
+      emit("mounted", player);
 
-      player.on('play', () => {
-        emit('play', player);
-      });
-
-      player.on('pause', () => {
-        emit('pause', player);
-      });
-      player.on('seeking', () => {
-        if (player.scrubbing_ && player.hasStarted_) {
-          seekingDebounce('seeking', player);
+      player.on("play", () => {
+        if (props.canPlay.value) {
+          emit("play", player);
         }
       });
 
-      player.on('timeupdate', () => {
+      player.on("pause", () => {
+        emit("pause", player);
+      });
+      player.on("seeking", () => {
+        if (player.scrubbing_ && player.hasStarted_) {
+          seekingDebounce("seeking", player);
+        }
+      });
+
+      player.on("timeupdate", () => {
         if (player.hasStarted_) {
-          timeUpdateDebounce('timeupdate', player);
+          timeUpdateDebounce("timeupdate", player);
         }
       });
     };
@@ -279,7 +281,7 @@ export default defineComponent({
 }
 
 .vjs-theme .vjs-volume-bar::before {
-  content: '';
+  content: "";
   z-index: 0;
   width: 0;
   height: 0;
@@ -299,7 +301,7 @@ export default defineComponent({
 }
 
 .vjs-theme .vjs-volume-level::before {
-  content: '';
+  content: "";
   z-index: 1;
   width: 0;
   height: 0;
