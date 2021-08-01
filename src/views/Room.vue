@@ -31,12 +31,14 @@
 <script>
 import { defineComponent, onMounted, reactive, ref } from 'vue';
 import { useRoute } from 'vue-router';
-// import Videojs from '@/components/Videojs';
-import Videojs from '@/components/Video';
+import Videojs from '@/components/Videojs';
+// import Videojs from '@/components/Video';
 import socket from '@/utils/socket';
 
 import InputText from 'primevue/inputtext';
 import Button from 'primevue/button';
+
+import useEventsStore from '@/stores/events';
 
 export default defineComponent({
   name: 'Room',
@@ -49,6 +51,8 @@ export default defineComponent({
     const route = useRoute();
     const roomId = route.params.id;
     const newSrc = ref('');
+    const eventstore = useEventsStore();
+
     const playerOptions = reactive({
       sources: [
         {
@@ -58,11 +62,14 @@ export default defineComponent({
           // type: "video/youtube",
         },
       ],
+      autoplay: false,
     });
+
     window.socket = socket;
     socket.emit('join-room', { roomId });
 
     let player = null;
+
     const setMounted = (p) => {
       player = p;
       window.player = player;
@@ -73,14 +80,14 @@ export default defineComponent({
     };
 
     socket.on('changesrc', (data) => {
-      console.log('onchangesrc', data);
+      // console.log('onchangesrc', data);
       changeSrc(data.src);
     });
 
     socket.emit('syncronice');
 
     socket.on('syncronice', ({ lastSeeking, playing }) => {
-      console.log('Syncronicing!:', lastSeeking, playing);
+      // console.log('Syncronicing!:', lastSeeking, playing);
       try {
         if (lastSeeking) {
           player.tech_['trigger']('firstplay');
@@ -93,13 +100,6 @@ export default defineComponent({
         }
       } catch (error) {
         // console.log("Syncronice error", error);
-      }
-    });
-
-    socket.on('play', () => {
-      if (player.paused()) {
-        // console.log("Socket onplay");
-        player.play();
       }
     });
 
@@ -120,7 +120,7 @@ export default defineComponent({
 
     socket.on('seeking', (time) => {
       if (!player.scrubbing_) {
-        // console.log("Socket onseeking", time);
+        console.log('Socket onseeking', time);
         player.currentTime(time);
       }
     });
@@ -128,17 +128,23 @@ export default defineComponent({
     // Player events
     const playEvent = (player) => {
       console.log('player', player);
-      socket.emit('play');
+      if (eventstore.canPlay) {
+        socket.emit('play');
+      }
     };
 
     const pauseEvent = (player) => {
       console.log('player', player);
-      socket.emit('pause');
+      if (eventstore.canPause) {
+        socket.emit('pause');
+      }
     };
 
     const seekingEvent = (player) => {
-      // console.log("Emit seeking!", player.currentTime());
-      socket.volatile.emit('seeking', player.currentTime());
+      console.log('Emit seeking!', player.currentTime());
+      if (eventstore.canSeek) {
+        socket.volatile.emit('seeking', player.currentTime());
+      }
     };
 
     const timeupdateEvent = (player) => {
@@ -161,7 +167,7 @@ export default defineComponent({
 
     const emitChangeSrc = () => {
       socket.emit('changesrc', playerOptions.sources[0].src);
-      console.log('Emit changesrc');
+      // console.log('Emit changesrc');
     };
 
     onMounted(() => {
@@ -169,7 +175,7 @@ export default defineComponent({
         'visibilitychange',
         () => {
           if (!document.hidden) {
-            console.log('Executing visibilitychange');
+            // console.log('Executing visibilitychange');
             socket.emit('syncronice');
           }
         },
