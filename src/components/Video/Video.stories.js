@@ -1,11 +1,11 @@
-import Video from "./Video.vue";
+import Video from './Video.vue';
 
 export default {
-  title: "Video",
+  title: 'Video',
   component: Video,
 };
 
 export const Default = () => ({
   components: { Video },
-  template: "<Video />",
+  template: '<Video />',
 });
