@@ -1,5 +1,6 @@
 <template>
   <div id="video-container" ref="videoContainer">
+    <!-- <div id="overlay"></div> -->
     <video id="video" class="video-js vjs-theme"></video>
   </div>
 </template>
@@ -13,14 +14,17 @@ import 'video.js/dist/video-js.css';
 
 export default defineComponent({
   name: 'Videojs',
+  components: {},
   props: {
     data: {
       type: Object,
       default: () => ({
         sources: [
           {
-            src: 'https://www.youtube.com/watch?v=UN3uF3990Q0',
-            type: 'video/youtube',
+            src: null,
+            type: null,
+            // src: 'https://www.youtube.com/watch?v=UN3uF3990Q0',
+            // type: 'video/youtube',
           },
         ],
       }),
@@ -31,7 +35,7 @@ export default defineComponent({
     let player;
     const videoContainer = ref(null);
     const seekingDebounce = debounce(emit, 50, { maxWait: 100 });
-    const timeupdateDebounce = debounce(emit, 25, { maxWait: 50 });
+    const timeUpdateDebounce = debounce(emit, 25, { maxWait: 50 });
 
     const setUpPlayer = () => {
       player = videojs('video', {
@@ -46,26 +50,22 @@ export default defineComponent({
 
       emit('mounted', player);
 
-      player.on('play', (e) => {
-        console.log('play', e);
+      player.on('play', () => {
         emit('play', player);
       });
 
-      player.on('pause', (e) => {
-        console.log('pause', e);
+      player.on('pause', () => {
         emit('pause', player);
       });
       player.on('seeking', () => {
-        // console.log("!seeking!");
         if (player.scrubbing_ && player.hasStarted_) {
-          // console.log("seeking", player.currentTime());
           seekingDebounce('seeking', player);
         }
       });
 
       player.on('timeupdate', () => {
         if (player.hasStarted_) {
-          timeupdateDebounce('timeupdate', player);
+          timeUpdateDebounce('timeupdate', player);
         }
       });
     };
@@ -76,7 +76,10 @@ export default defineComponent({
       player.dispose();
     });
 
-    return { player, videoContainer };
+    return {
+      player,
+      videoContainer,
+    };
   },
 });
 </script>
@@ -84,7 +87,17 @@ export default defineComponent({
 <style lang="scss">
 #video-container {
   width: 100%;
+  position: relative;
   // padding-bottom: 56.25%; /* 16:9, for an aspect ratio of 1:1 change to this value to 100% */
+
+  #overlay {
+    z-index: 1;
+    background-color: rgba(255, 0, 0, 0.2);
+    height: 100%;
+    width: 100%;
+    position: absolute;
+    pointer-events: none;
+  }
 }
 #video {
   position: relative;
